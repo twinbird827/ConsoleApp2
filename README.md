@@ -27,7 +27,15 @@ ConsoleApp2 - Arrangay
 
 ## Requirement
 
+.NET Framework 4.5.2
+
 ## Usage
+
+1. C:\Testを対象にして実行します。
+Arrangay.exe "C:\Test"
+
+2. C:\Test1とC:\Test2を対象にして実行します。
+Arrangay.exe "C:\Test1" "C:\Test2" ...
 
 ## Install
 
