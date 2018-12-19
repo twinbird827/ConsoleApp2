@@ -11,26 +11,41 @@ namespace ConsoleApp2
     class Program
     {
         /// <summary>
+        /// 削除対象のﾌｧｲﾙ拡張子
+        /// </summary>
+        private static string[] IgnoreExtension = new string[]
+        {
+            ".dll",
+            ".htm",
+            ".lnk",
+            ".url",
+            ".html"
+        };
+
+        /// <summary>
+        /// 削除対象のﾃﾞｨﾚｸﾄﾘ名
+        /// </summary>
+        private static string[] IgnoreDirectory = new string[]
+        {
+            "単ページ"
+        };
+
+        /// <summary>
         /// 指定したﾌｫﾙﾀﾞ内の階層構造を一つのﾌｫﾙﾀﾞに纏めます。
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            //var src = "123test456test789";
-            //var result1 = Regex.Replace(src, @"\d+", p => string.Format("{0,0:D6}", int.Parse(p.Value)));
-            //var result2 = Regex.Replace(src, @"\d+", p => p.Value.PadLeft(6, '0'));
-            //Console.WriteLine($"SourceString={src}\nResult1={result1}\nResult2={result2}");
-            //var s = "123test456test7890123";
-            //Console.WriteLine(Regex.Replace(s, @"\d+", p => p.Value.PadLeft(6, '0')));
-            //Console.WriteLine(Regex.Replace(Regex.Replace(s, @"\d+", "00000$0"), @"(0*)(\d{5})", "$2"));
-            //Console.WriteLine(string.Format("{0,0:D6}", 123));
             foreach (var path in args)
             {
                 Execute(path);
             }
-            Console.ReadLine();
         }
 
+        /// <summary>
+        /// 指定したﾃﾞｨﾚｸﾄﾘの処理を実行します。
+        /// </summary>
+        /// <param name="path">ﾃﾞｨﾚｸﾄﾘのﾌﾙﾊﾟｽ</param>
         private static void Execute(string path)
         {
             if (!Directory.Exists(path))
@@ -51,35 +66,56 @@ namespace ConsoleApp2
             Console.WriteLine("処理が完了しました。");
         }
 
+        /// <summary>
+        /// ﾘﾈｰﾑ処理を実行します。
+        /// </summary>
+        /// <param name="baseDir">基底ﾃﾞｨﾚｸﾄﾘ</param>
+        /// <param name="target">対象ﾃﾞｨﾚｸﾄﾘ</param>
         private static void Rename(string baseDir, string target)
         {
-            foreach (var file in Directory.GetFiles(target))
+            if (!IgnoreDirectory.Any(dir => target.ToLower().EndsWith(dir)))
             {
-                var identifer = baseDir.Equals(target)
-                    ? "__"
-                    : Directory.GetParent(file).Name;
+                foreach (var file in Directory.GetFiles(target))
+                {
+                    if (!IgnoreExtension.Any(extension => file.ToLower().EndsWith(extension)))
+                    {
+                        // 処理対象
+                        var identifer = baseDir.Equals(target)
+                            ? "__"
+                            : Directory.GetParent(file).Name;
 
-                identifer = "color".Equals(identifer)
-                    ? "_"
-                    : identifer;
+                        identifer = "color".Equals(identifer)
+                            ? "_"
+                            : identifer;
 
-                File.Move(
-                    file,
-                    Path.Combine(baseDir, $"{identifer}{Path.GetFileName(file)}")
-                );
-            }
-            
-            foreach (var dir in Directory.GetDirectories(target))
-            {
-                Rename(baseDir, dir);
+                        File.Move(
+                            file,
+                            Path.Combine(baseDir, $"{identifer}{Path.GetFileName(file)}")
+                        );
+                    }
+                    else
+                    {
+                        // 削除対象
+                        File.Delete(file);
+                    }
+                }
+
+                foreach (var dir in Directory.GetDirectories(target))
+                {
+                    Rename(baseDir, dir);
+                }
             }
 
             if (!baseDir.Equals(target))
             {
-                Directory.Delete(target);
+                DeleteAll(target);
             }
         }
 
+        /// <summary>
+        /// ﾃﾞｨﾚｸﾄﾘ内のﾌｧｲﾙを連番に変更します。
+        /// </summary>
+        /// <param name="path">ﾃﾞｨﾚｸﾄﾘ</param>
         private static void Organize(string path)
         {
             Directory.GetFiles(path)
@@ -107,6 +143,28 @@ namespace ConsoleApp2
                     return file;
                 })
                 .ToArray();
+        }
+
+        /// <summary>
+        /// ﾃﾞｨﾚｸﾄﾘを削除します。
+        /// </summary>
+        /// <param name="path">ﾃﾞｨﾚｸﾄﾘ</param>
+        private static void DeleteAll(string path)
+        {
+            foreach (var file in Directory.GetFiles(path))
+            {
+                // ﾌｧｲﾙを削除
+                File.Delete(file);
+            }
+
+            foreach (var dir in Directory.GetDirectories(path))
+            {
+                // 子ﾃﾞｨﾚｸﾄﾘの内容を削除
+                DeleteAll(dir);
+            }
+
+            // ﾃﾞｨﾚｸﾄﾘを削除
+            Directory.Delete(path);
         }
     }
 }
