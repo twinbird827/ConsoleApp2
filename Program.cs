@@ -19,7 +19,9 @@ namespace ConsoleApp2
             ".htm",
             ".lnk",
             ".url",
-            ".html"
+            ".html",
+            ".shtml",
+            ".txt"
         };
 
         /// <summary>
