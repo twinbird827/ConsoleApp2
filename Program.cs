@@ -90,10 +90,11 @@ namespace ConsoleApp2
                             ? "_"
                             : identifer;
 
-                        File.Move(
-                            file,
-                            Path.Combine(baseDir, $"{identifer}{Path.GetFileName(file)}")
-                        );
+                        var dest = Path.Combine(baseDir, $"{identifer}{Path.GetFileName(file)}");
+
+                        if (File.Exists(dest)) File.Delete(dest);
+
+                        File.Move(file,  dest);
                     }
                     else
                     {
