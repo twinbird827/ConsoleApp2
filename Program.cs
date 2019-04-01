@@ -15,6 +15,7 @@ namespace ConsoleApp2
         /// </summary>
         private static string[] IgnoreExtension = new string[]
         {
+            ".db",
             ".dll",
             ".htm",
             ".lnk",
