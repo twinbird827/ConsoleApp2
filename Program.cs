@@ -95,7 +95,7 @@ namespace ConsoleApp2
 
                         if (File.Exists(dest)) File.Delete(dest);
 
-                        File.Move(file,  dest);
+                        File.Move(file, dest);
                     }
                     else
                     {
@@ -130,7 +130,7 @@ namespace ConsoleApp2
                     var dst = Path.Combine(path, Regex.Replace(file, @"\d+", p => p.Value.PadLeft(6, '0')));
 
                     File.Move(src, dst);
-                    
+
                     return dst;
                 })
                 .OrderBy(s => s)
